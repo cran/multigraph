@@ -1,5 +1,5 @@
 multigraph <-
-function (net, layout = c("circ", "stress", "rand"), directed = TRUE, 
+function (net, layout = c("circ", "force", "rand"), directed = TRUE, 
     collRecip = TRUE, coord = NULL, tcol = 1, bwd = 1, clu = NULL, 
     cex = NULL, tcex = NULL, showLbs = TRUE, showAtts = TRUE, 
     att = NULL, lbat = "1", seed = NULL, maxiter = 100, alpha = c(1, 
@@ -33,13 +33,6 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
     ifelse(missing(asp) == TRUE, asp <- 1, NA)
     ifelse(missing(lwd) == TRUE, lwd <- 1, NA)
     ifelse(missing(pch) == TRUE, pch <- 21, NA)
-    if (missing(pos) == TRUE) {
-        pos <- 4
-    }
-    else {
-        if (isTRUE(pos < 0L) == TRUE | isTRUE(pos > 4L) == TRUE) 
-            stop("Invalid \"pos\" value.")
-    }
     ifelse(missing(bg) == TRUE, bg <- graphics::par()$bg, NA)
     ifelse(missing(mar) == TRUE, mar <- graphics::par()$mar, 
         NA)
@@ -48,7 +41,7 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
     ifelse(isTRUE(bwd > 1L) == TRUE, bwd <- 1L, NA)
     ifelse(isTRUE(bwd <= 0L) == TRUE, bwd <- 0L, NA)
     if (!(missing(hds))) {
-        ifelse(isTRUE(hds == 0L) == TRUE, hds <- 1L, NA)
+        ifelse(isTRUE(hds == 0L) == TRUE, hds <- 0.01, NA)
     }
     else {
         hds <- 1L
@@ -254,25 +247,113 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
     else {
         vcol0 <- vcol
     }
-    ifelse(isTRUE(length(bds) == 0) == TRUE, m <- n, m <- dim(suppressWarnings(multiplex::rm.isol(net, 
-        diag.incl = FALSE)))[1])
+    if (isTRUE(flgcx == TRUE) == FALSE) {
+        ifelse(isTRUE(directed == TRUE) == TRUE, fds <- 130L, 
+            fds <- 140L)
+    }
+    else if (isTRUE(flgcx == TRUE) == TRUE) {
+        fds <- 85L + (n * 2L)
+    }
     if (is.null(coord) == FALSE) {
         if (isTRUE(nrow(coord) == n) == FALSE) 
             stop("Length of 'coord' does not match network order.")
-        ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- 100L + (m * 
-            2L), fds <- 110L)
-        if (missing(rot) == FALSE) {
-            coord[, 1:2] <- xyrt(coord[, 1:2], as.numeric(rot))
-            coord[, 1:2] <- coord[, 1:2] - min(coord[, 1:2])
+        flgcrd <- TRUE
+    }
+    else if (is.null(coord) == TRUE) {
+        flgcrd <- FALSE
+        switch(match.arg(layout), force = {
+            coord <- frcd(net, seed = seed, maxiter = maxiter)
+            ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- fds - 
+                15L, NA)
+        }, circ = {
+            coord <- data.frame(X = sin(2L * pi * ((0:(n - 1L))/n)), 
+                Y = cos(2L * pi * ((0:(n - 1L))/n)))
+            ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- fds - 
+                10L, NA)
+        }, rand = {
+            set.seed(seed)
+            coord <- data.frame(X = round(stats::runif(n) * 1L, 
+                5), Y = round(stats::runif(n) * 1L, 5))
+        })
+    }
+    if (missing(rot) == FALSE) {
+        coord[, 1:2] <- xyrt(coord[, 1:2], as.numeric(rot))
+        coord[, 1:2] <- coord[, 1:2] - min(coord[, 1:2])
+        cnt <- 1L
+    }
+    else {
+        cnt <- 0
+    }
+    if (match.arg(layout) == "circ" && missing(pos) == TRUE) {
+        angl <- vector()
+        length(angl) <- n
+        for (i in 1:n) {
+            ifelse((atan2((coord[i, 2] - cnt), (coord[i, 1] - 
+                cnt)) * (180L/pi)) >= 0, angl[i] <- atan2((coord[i, 
+                2] - cnt), (coord[i, 1] - cnt)) * (180L/pi), 
+                angl[i] <- ((atan2((coord[i, 2] - cnt), (coord[i, 
+                  1] - cnt)) * (180L/pi))%%180L) + 180L)
         }
-        rat <- (max(coord[, 1]) - min(coord[, 1]))/(max(coord[, 
-            2]) - min(coord[, 2]))
-        coord[, 1] <- (coord[, 1] - min(coord[, 1]))/(max(coord[, 
-            1]) - min(coord[, 1]))
-        ifelse(isTRUE(rat > 0) == TRUE, coord[, 2] <- ((coord[, 
-            2] - min(coord[, 2]))/(max(coord[, 2]) - min(coord[, 
-            2]))) * (1L/rat), coord[, 2] <- ((coord[, 2] - min(coord[, 
-            2]))/(max(coord[, 2]) - min(coord[, 2]))) * (rat))
+        rm(i)
+        pos <- vector()
+        for (i in 1:length(angl)) {
+            if (isTRUE(65 < angl[i]) == TRUE && isTRUE(115 > 
+                angl[i]) == TRUE) {
+                pos <- append(pos, 3)
+            }
+            else if (isTRUE(115 <= angl[i]) == TRUE && isTRUE(245 >= 
+                angl[i]) == TRUE) {
+                pos <- append(pos, 2)
+            }
+            else if (isTRUE(245 < angl[i]) == TRUE && isTRUE(295 > 
+                angl[i]) == TRUE) {
+                pos <- append(pos, 1)
+            }
+            else {
+                pos <- append(pos, 4)
+            }
+        }
+        rm(i)
+    }
+    if (missing(pos) == TRUE) {
+        pos <- 4
+    }
+    else {
+        if (isTRUE(pos < 0L) == TRUE | isTRUE(pos > 4L) == TRUE) 
+            stop("Invalid \"pos\" value.")
+    }
+    ifelse(missing(mirrorX) == FALSE && isTRUE(mirrorX == TRUE) == 
+        TRUE, coord[, 1] <- coord[, 1] * cos(pi) - coord[, 2] * 
+        sin(pi), mirrorX <- FALSE)
+    ifelse(missing(mirrorY) == FALSE && isTRUE(mirrorY == TRUE) == 
+        TRUE, coord[, 2] <- coord[, 2] * cos(pi) - coord[, 1] * 
+        sin(pi), mirrorY <- FALSE)
+    if (match.arg(layout) == "circ") {
+        if (isTRUE(mirrorX == TRUE) == TRUE && isTRUE(length(pos) == 
+            n) == TRUE) {
+            pos[which(pos == 2)] <- 0
+            pos[which(pos == 4)] <- 2
+            pos[which(pos == 0)] <- 4
+        }
+        else if (isTRUE(mirrorY == TRUE) == TRUE && isTRUE(length(pos) == 
+            n) == TRUE) {
+            pos[which(pos == 1)] <- 0
+            pos[which(pos == 3)] <- 1
+            pos[which(pos == 0)] <- 3
+        }
+        else {
+            NA
+        }
+    }
+    rat <- (max(coord[, 1]) - min(coord[, 1]))/(max(coord[, 2]) - 
+        min(coord[, 2]))
+    coord[, 1] <- (coord[, 1] - min(coord[, 1]))/(max(coord[, 
+        1]) - min(coord[, 1]))
+    ifelse(isTRUE(rat > 0) == TRUE, coord[, 2] <- ((coord[, 2] - 
+        min(coord[, 2]))/(max(coord[, 2]) - min(coord[, 2]))) * 
+        (1L/rat), coord[, 2] <- ((coord[, 2] - min(coord[, 2]))/(max(coord[, 
+        2]) - min(coord[, 2]))) * (rat))
+    if (isTRUE(flgcrd == TRUE) == TRUE) {
         if (isTRUE(ncol(coord) > 2) == TRUE) {
             lbgml <- tolower(as.vector(coord[, 3]))
             lbnet <- tolower(as.vector(dimnames(net)[[1]]))
@@ -293,122 +374,44 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
             nds <- data.frame(X = as.numeric(as.vector(coord[, 
                 1])), Y = as.numeric(as.vector(coord[, 2])))
         }
-        nds <- (2L/max(nds)) * nds
-        if (isTRUE(flgcx == TRUE) == TRUE && isTRUE(area(nds) < 
-            (1/3)) == TRUE) {
-            nds <- nds * (2.223 - (4.45 * (sqrt(((max(nds[, 1]) - 
-                min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 2])))/n))))
-        }
-        else {
-            nds <- nds * (0.5)
-        }
-        are <- 50L + (1/area(nds))
-        m <- n
-        ifelse(isTRUE(max(cex) < 2) == TRUE, fds <- fds + (stats::median(cex) * 
-            2), NA)
     }
-    else if (is.null(coord) == TRUE) {
-        switch(match.arg(layout), stress = {
-            ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- 110L - 
-                (m * 2L), fds <- 90L)
-            if (isTRUE(m > 2) == TRUE) {
-                cds <- stss(net, seed = seed, maxiter = maxiter)
-            } else {
-                set.seed(seed)
-                cds <- as.data.frame(xyrt(data.frame(X = sin(2L * 
-                  pi * ((0:(n - 1L))/n)), Y = cos(2L * pi * ((0:(n - 
-                  1L))/n))), as.numeric(stats::runif(n, min = 0, 
-                  max = 360))))
-            }
-            if (missing(rot) == FALSE) {
-                cds <- xyrt(cds, as.numeric(rot))
-            }
-            if (isTRUE(m > 3) == TRUE) {
-                rat <- (max(cds[, 1]) - min(cds[, 1]))/(max(cds[, 
-                  2]) - min(cds[, 2]))
-                cds[, 1] <- (cds[, 1] - min(cds[, 1]))/(max(cds[, 
-                  1]) - min(cds[, 1]))
-                ifelse(isTRUE(rat > 0) == TRUE, cds[, 2] <- ((cds[, 
-                  2] - min(cds[, 2]))/(max(cds[, 2]) - min(cds[, 
-                  2]))) * (1L/rat), cds[, 2] <- ((cds[, 2] - 
-                  min(cds[, 2]))/(max(cds[, 2]) - min(cds[, 2]))) * 
-                  (rat))
-            }
-            nds <- data.frame(X = as.numeric(as.vector(cds[, 
-                1])), Y = as.numeric(as.vector(cds[, 2])))
-            if (isTRUE(n > 6) == TRUE && isTRUE(area(nds) < (1/2.8)) == 
-                TRUE) {
-                nds <- nds * (2.223 - (4.45 * area(nds)))
-            } else {
-                nds <- nds * (1 - area(nds))
-            }
-            are <- 50L + (1/area(nds))
-            ifelse(isTRUE(max(cex) < 2) == TRUE, NA, fds <- fds + 
-                (mean(cex) * 3))
-        }, circ = {
-            nds <- data.frame(X = sin(2L * pi * ((0:(n - 1L))/n)), 
-                Y = cos(2L * pi * ((0:(n - 1L))/n)))
-            if (missing(rot) == FALSE) {
-                nds <- as.data.frame(xyrt(nds, as.numeric(rot)))
-            }
-            if (isTRUE(flgcx == TRUE) == TRUE) {
-                rat <- (max(nds[, 1]) - min(nds[, 1]))/(max(nds[, 
-                  2]) - min(nds[, 2]))
-                nds[, 1] <- (nds[, 1] - min(nds[, 1]))/(max(nds[, 
-                  1]) - min(nds[, 1]))
-                ifelse(isTRUE(rat > 0) == TRUE, nds[, 2] <- ((nds[, 
-                  2] - min(nds[, 2]))/(max(nds[, 2]) - min(nds[, 
-                  2]))) * (1L/rat), nds[, 2] <- ((nds[, 2] - 
-                  min(nds[, 2]))/(max(nds[, 2]) - min(nds[, 2]))) * 
-                  (rat))
-                fds <- 120L
-            } else {
-                fds <- 70L
-            }
-            are <- 30L + (lwd * 10L)
-        }, rand = {
-            ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- 100L + 
-                (m * 2L), fds <- 100L + (n * 2L))
-            set.seed(seed)
-            nds <- data.frame(X = round(stats::runif(n) * 1L, 
-                5), Y = round(stats::runif(n) * 1L, 5))
-            if (isTRUE(n == 3) == TRUE) {
-                if (isTRUE(area(nds) < 1/6) == TRUE) {
-                  nds <- nds * (n)
-                } else if (isTRUE(area(nds) < 1/5) == TRUE) {
-                  nds <- nds * (2)
-                } else if (isTRUE(area(nds) < 1/4) == TRUE) {
-                  nds <- nds * (1.5)
-                } else {
-                  NA
-                }
-            }
-            are <- 50L + (1/area(nds))
-            ifelse(isTRUE(max(cex) < 2) == TRUE, NA, fds <- fds + 
-                (mean(cex) * 3))
-            if (missing(rot) == FALSE) {
-                nds <- as.data.frame(xyrt(nds, as.numeric(rot)))
-            }
-        })
+    else {
+        nds <- data.frame(X = as.numeric(as.vector(coord[, 1])), 
+            Y = as.numeric(as.vector(coord[, 2])))
     }
-    ifelse(missing(mirrorX) == FALSE && isTRUE(mirrorX == TRUE) == 
-        TRUE, nds[, 1] <- nds[, 1] * cos(pi) - nds[, 2] * sin(pi), 
-        NA)
-    ifelse(missing(mirrorY) == FALSE && isTRUE(mirrorY == TRUE) == 
-        TRUE, nds[, 2] <- nds[, 2] * cos(pi) - nds[, 1] * sin(pi), 
-        NA)
+    nds <- (2L/max(nds)) * nds
+    if (isTRUE(flgcx == TRUE) == TRUE && isTRUE(sqrt(((max(nds[, 
+        1]) - min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)) < 
+        (1/3)) == TRUE) {
+        nds <- nds * (2.223 - (4.45 * (sqrt(((max(nds[, 1]) - 
+            min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 2])))/n))))
+    }
+    else {
+        nds <- nds * (0.5)
+    }
+    ifelse(isTRUE(max(cex) < 2) == TRUE, NA, bwd <- bwd * 0.75)
     opm <- graphics::par()$mar
     ifelse(all(mar == c(5.1, 4.1, 4.1, 2.1)) == TRUE, mar <- rep(0, 
         4), NA)
     ifelse(is.null(main) == TRUE, graphics::par(mar = mar), graphics::par(mar = mar + 
         c(0, 0, 2, 0)))
+    if (match.arg(layout) == "circ") {
+        ylim <- c(min(nds[, 2]) - (max(cex)/50L), max(nds[, 2]) + 
+            (max(cex)/50L))
+        xlim <- c(min(nds[, 1]) - (max(cex)/50L), max(nds[, 1]) + 
+            (max(cex)/50L))
+    }
+    else {
+        ylim <- c(min(nds[, 2]) - (max(cex)/100L), max(nds[, 
+            2]) + (max(cex)/100L))
+        xlim <- c(min(nds[, 1]) - (max(cex)/100L), max(nds[, 
+            1]) + (max(cex)/100L))
+    }
     obg <- graphics::par()$bg
     graphics::par(bg = grDevices::adjustcolor(bg, alpha = alpha[3]))
     graphics::plot(nds, type = "n", axes = FALSE, xlab = "", 
-        ylab = "", ylim = c(min(nds[, 2]) - (max(cex)/100L), 
-            max(nds[, 2]) + (max(cex)/100L)), xlim = c(min(nds[, 
-            1]) - (max(cex)/100L), max(nds[, 1]) + (max(cex)/100L)), 
-        asp = asp, main = main, cex.main = cex.main)
+        ylab = "", ylim = ylim, xlim = xlim, asp = asp, main = main, 
+        cex.main = cex.main)
     tlbs <- vector()
     for (i in 1:length(attr(bds, "names"))) {
         ifelse(isTRUE(length(multiplex::dhc(attr(bds, "names")[i], 
@@ -525,21 +528,17 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
                   cx <- rep(cex[1], 2)
                 }
                 fds <- fds + (vedist * -10)
-                ifelse(isTRUE(hds != 0) == TRUE, are <- (1/hds) * 
-                  50, NA)
                 if ((isTRUE(is.na(dim(net)[3]) == TRUE | dim(net)[3] == 
                   1) == TRUE)) {
                   mbnd(pars, rr, bds[[k]], vlt, cx, lwd, vecol, 
-                    directed, asp, bwd, alfa, are, fds, flgcx, 
-                    m)
+                    directed, asp, bwd, alfa, fds, flgcx)
                 }
                 else {
                   ifelse(isTRUE(length(lty) == 1L) == TRUE, mbnd(pars, 
                     rr, bds[[k]], vlt1, cx, lwd, vecol[vltc], 
-                    directed, asp, bwd, alfa, are, fds, flgcx, 
-                    m), mbnd(pars, rr, bds[[k]], vlt, cx, lwd, 
-                    vecol[vltc], directed, asp, bwd, alfa, are, 
-                    fds, flgcx, m))
+                    directed, asp, bwd, alfa, fds, flgcx), mbnd(pars, 
+                    rr, bds[[k]], vlt, cx, lwd, vecol[vltc], 
+                    directed, asp, bwd, alfa, fds, flgcx))
                 }
             }
             else {
@@ -565,13 +564,31 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
             ifelse(isTRUE(max(cex) < 2) == TRUE, tcex <- cex * 
                 0.66, tcex <- cex * 0.33)
         }
-        if (isTRUE(pos == 0) == TRUE) {
-            graphics::text(nds, labels = lbs, cex = tcex, adj = 0.5, 
-                col = tcol)
+        if (isTRUE(length(pos) == 1) == TRUE) {
+            if (isTRUE(pos == 0) == TRUE) {
+                graphics::text(nds, labels = lbs, cex = tcex, 
+                  adj = 0.5, col = tcol)
+            }
+            else {
+                graphics::text(nds, lbs, cex = tcex, pos = pos, 
+                  col = tcol, offset = (cex/4L), adj = c(0.5, 
+                    1))
+            }
+        }
+        else if (isTRUE(length(pos) == n) == TRUE) {
+            graphics::text(nds, lbs, cex = tcex, pos = pos, col = tcol[1], 
+                offset = (cex/4L), adj = c(0.5, 1))
         }
         else {
-            graphics::text(nds, lbs, cex = tcex, pos = pos, col = tcol, 
-                offset = (cex/4L), adj = c(0.5, 1))
+            if (isTRUE(pos[1] == 0) == TRUE) {
+                graphics::text(nds, labels = lbs, cex = tcex, 
+                  adj = 0.5, col = tcol)
+            }
+            else {
+                graphics::text(nds, lbs, cex = tcex, pos = pos[1], 
+                  col = tcol, offset = (cex/4L), adj = c(0.5, 
+                    1))
+            }
         }
     }
     if (isTRUE(showAtts == TRUE) == TRUE) {
@@ -612,15 +629,8 @@ function (net, layout = c("circ", "stress", "rand"), directed = TRUE,
         else {
             atts <- rep("", nrow(nds))
         }
-        if (isTRUE(pos == 4) == TRUE) {
-            graphics::text(nds, labels = atts, cex = tcex, pos = 3, 
-                col = tcol, offset = (cex/4L), adj = c(1.5, 2))
-        }
-        else {
-            graphics::text(nds, labels = atts, cex = tcex, pos = pos + 
-                1L, col = tcol, offset = (cex/4L), adj = c(1.5, 
-                2))
-        }
+        graphics::text(nds, labels = atts, cex = tcex, pos = pos%%4 + 
+            1L, col = tcol, offset = (cex/4L), adj = c(1.5, 2))
     }
     graphics::par(mar = opm)
     graphics::par(bg = obg)

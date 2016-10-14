@@ -1,7 +1,8 @@
-stss <-
-function (net, seed = seed, maxiter = maxiter) 
+frcd <-
+function (net, seed = seed, maxiter) 
 {
     n <- dim(net)[1]
+    ifelse(missing(maxiter) == TRUE, maxiter <- (60L + n), NA)
     mat <- multiplex::mnplx(net, directed = FALSE)
     ifelse(is.null(rownames(mat)) == TRUE, lbs <- 1:n, lbs <- rownames(mat))
     cmps <- multiplex::comps(net)
@@ -12,7 +13,7 @@ function (net, seed = seed, maxiter = maxiter)
         if (is.null(cmps$com[[k]]) == FALSE) {
             com <- which(lbs %in% cmps$com[[k]])
             if (isTRUE(length(cmps$com[[k]]) < 3L) == TRUE) {
-                tmp <- popl(2L, seed = seed)/(n/(n/3L/(n/2L))/n)
+                tmp <- popl(2L, seed = seed)/3L
                 locx <- tmp[, 1]
                 locy <- tmp[, 2]
                 K <- 1
@@ -116,10 +117,10 @@ function (net, seed = seed, maxiter = maxiter)
         tmpi <- popl(length(cmps$isol), seed = seed)/(length(cmps$isol) * 
             2) * K * length(cmps$isol)
         if (is.null(cmps$com) == FALSE) {
-            locx <- ((tmpi[, 1]/1L) - (min(ndst[, 1])) - 0)
+            locx <- ((tmpi[, 1]/3L) - (min(ndst[, 1])) - 0)
             ifelse(isTRUE(rat > 0) == TRUE, locy <- ((min(ndst[, 
-                2])) - (tmpi[, 2]/1L) - 0), locy <- ((max(ndst[, 
-                2])) + (tmpi[, 2]/1L) + 0))
+                2])) - (tmpi[, 2]/3L) - 0), locy <- ((max(ndst[, 
+                2])) + (tmpi[, 2]/3L) + 0))
             ndst.chull <- grDevices::chull(ndst)
             ndst.chull <- ndst[ndst.chull, ]
             ifelse(isTRUE(length(which(ndst.chull[, 1] < mean(ndst.chull[, 

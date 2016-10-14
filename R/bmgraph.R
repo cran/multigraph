@@ -1,5 +1,5 @@
 bmgraph <-
-function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress", 
+function (net, layout = c("bip", "bip3", "bip3e", "bip4", "force", 
     "rand", "circ"), coord = NULL, tcex = NULL, alpha = c(1, 
     1, 1), showLbs = TRUE, showAtts = TRUE, att = NULL, lbat = "1", 
     main = NULL, cex.main, bg, mar, cex, pos, lwd, lty, ecol, 
@@ -11,49 +11,52 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
     ifelse(missing(directed) == TRUE, directed <- FALSE, NA)
     ifelse(missing(collRecip) == TRUE, collRecip <- TRUE, NA)
     ifelse(missing(tcol) == TRUE, tcol <- c(1, 1), NA)
-    ifelse(missing(pch) == TRUE, pch <- c(19, 15), NA)
+    ifelse(missing(pch) == TRUE, pch <- 1:0, NA)
     if (missing(clu)) {
         ifelse(isTRUE(length(pch) > 1L) == TRUE, pch <- pch[1:2], 
             pch <- rep(pch, 2))
     }
+    ifelse(isTRUE(dim(net)[1] == 1L) == TRUE && ((match.arg(layout) == 
+        "bip3") | (match.arg(layout) == "bip4")), layout <- "bip", 
+        NA)
+    ifelse(isTRUE(dim(net)[2] == 1L) == TRUE && ((match.arg(layout) == 
+        "bip3e") | (match.arg(layout) == "bip4")), layout <- "bip", 
+        NA)
     nn <- dim(net)[1]
     mm <- dim(net)[2]
     if (is.na(dim(net)[3]) == TRUE) {
         if (isTRUE(directed == TRUE) == FALSE) {
-            bmnet <- (base::rbind(base::cbind(matrix(0, ncol = nn, 
-                nrow = nn, dimnames = list(rownames(net), rownames(net))), 
-                net), base::cbind(t(net), matrix(0, ncol = mm, 
-                nrow = mm, dimnames = list(colnames(net), colnames(net))))))
+            bmnet <- (rbind(cbind(matrix(0, ncol = nn, nrow = nn, 
+                dimnames = list(rownames(net), rownames(net))), 
+                net), cbind(t(net), matrix(0, ncol = mm, nrow = mm, 
+                dimnames = list(colnames(net), colnames(net))))))
         }
         else if (isTRUE(directed == TRUE) == TRUE) {
-            bmnet <- (base::rbind(base::cbind(matrix(0, ncol = nn, 
-                nrow = nn, dimnames = list(rownames(net), rownames(net))), 
-                net), base::cbind(matrix(0, ncol = nn, nrow = mm, 
-                dimnames = list(colnames(net), rownames(net))), 
-                matrix(0, ncol = mm, nrow = mm, dimnames = list(colnames(net), 
-                  colnames(net))))))
+            bmnet <- (rbind(cbind(matrix(0, ncol = nn, nrow = nn, 
+                dimnames = list(rownames(net), rownames(net))), 
+                net), cbind(matrix(0, ncol = nn, nrow = mm, dimnames = list(colnames(net), 
+                rownames(net))), matrix(0, ncol = mm, nrow = mm, 
+                dimnames = list(colnames(net), colnames(net))))))
         }
     }
     else {
         bmnetdf <- data.frame(matrix(ncol = (nn + mm)^2, nrow = 0))
         for (k in 1:dim(net)[3]) {
             if (isTRUE(directed == TRUE) == FALSE) {
-                temp <- (base::rbind(base::cbind(matrix(0, ncol = nn, 
-                  nrow = nn, dimnames = list(rownames(net[, , 
-                    k]), rownames(net[, , k]))), net[, , k]), 
-                  base::cbind(t(net[, , k]), matrix(0, ncol = mm, 
-                    nrow = mm, dimnames = list(colnames(net[, 
-                      , k]), colnames(net[, , k]))))))
+                temp <- (rbind(cbind(matrix(0, ncol = nn, nrow = nn, 
+                  dimnames = list(rownames(net[, , k]), rownames(net[, 
+                    , k]))), net[, , k]), cbind(t(net[, , k]), 
+                  matrix(0, ncol = mm, nrow = mm, dimnames = list(colnames(net[, 
+                    , k]), colnames(net[, , k]))))))
             }
             else if (isTRUE(directed == TRUE) == TRUE) {
-                temp <- (base::rbind(base::cbind(matrix(0, ncol = nn, 
-                  nrow = nn, dimnames = list(rownames(net[, , 
-                    k]), rownames(net[, , k]))), net[, , k]), 
-                  base::cbind(matrix(0, ncol = nn, nrow = mm, 
-                    dimnames = list(colnames(net[, , k]), rownames(net[, 
-                      , k]))), matrix(0, ncol = mm, nrow = mm, 
-                    dimnames = list(colnames(net[, , k]), colnames(net[, 
-                      , k]))))))
+                temp <- (rbind(cbind(matrix(0, ncol = nn, nrow = nn, 
+                  dimnames = list(rownames(net[, , k]), rownames(net[, 
+                    , k]))), net[, , k]), cbind(matrix(0, ncol = nn, 
+                  nrow = mm, dimnames = list(colnames(net[, , 
+                    k]), rownames(net[, , k]))), matrix(0, ncol = mm, 
+                  nrow = mm, dimnames = list(colnames(net[, , 
+                    k]), colnames(net[, , k]))))))
             }
             bmnetdf[(nrow(bmnetdf) + 1), ] <- as.vector(temp)
         }
@@ -203,7 +206,7 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
     }
     flgcx <- FALSE
     if (missing(cex) == TRUE) {
-        if (isTRUE(match.arg(layout) == "stress") == TRUE | isTRUE(match.arg(layout) == 
+        if (isTRUE(match.arg(layout) == "force") == TRUE | isTRUE(match.arg(layout) == 
             "rand") == TRUE) {
             if (isTRUE(length(bds) == 0) == TRUE) {
                 cex <- 1L
@@ -348,30 +351,32 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
                 1])), Y = as.numeric(as.vector(coord[, 2])))
         }
         nds <- (2L/max(nds)) * nds
-        if (isTRUE(flgcx == TRUE) == TRUE && isTRUE(area(nds) < 
-            (1/3)) == TRUE) {
+        if (isTRUE(flgcx == TRUE) == TRUE && isTRUE(sqrt(((max(nds[, 
+            1]) - min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 
+            2])))/nrow(nds)) < (1/3)) == TRUE) {
             nds <- nds * (2.223 - (4.45 * (sqrt(((max(nds[, 1]) - 
                 min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 2])))/n))))
         }
         else {
             nds <- nds * (0.5)
         }
-        are <- 50L + (1/area(nds))
+        are <- 50L + (1/sqrt(((max(nds[, 1]) - min(nds[, 1])) * 
+            (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)))
         m <- n
         ifelse(isTRUE(max(cex) < 2) == TRUE, fds <- fds + (stats::median(cex) * 
             2), NA)
     }
     else if (is.null(coord) == TRUE) {
-        switch(match.arg(layout), stress = {
+        switch(match.arg(layout), force = {
             ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- 110L - 
                 (m * 2L), fds <- 90L)
             ifelse(missing(maxiter) == TRUE, maxiter <- 99L, 
                 NA)
             if (missing(seed) == TRUE) {
-                cds <- stss(as.matrix(multiplex::mnplx(bmnet)), 
+                cds <- frcd(as.matrix(multiplex::mnplx(bmnet)), 
                   seed = set.seed(NULL), maxiter = maxiter)
             } else {
-                cds <- stss(as.matrix(multiplex::mnplx(bmnet)), 
+                cds <- frcd(as.matrix(multiplex::mnplx(bmnet)), 
                   seed = seed, maxiter = maxiter)
             }
             if (missing(rot) == FALSE) {
@@ -390,21 +395,27 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             }
             nds <- data.frame(X = as.numeric(as.vector(cds[, 
                 1])), Y = as.numeric(as.vector(cds[, 2])))
-            if (isTRUE(n > 6) == TRUE && isTRUE(area(nds) < (1/2.8)) == 
-                TRUE) {
-                nds <- nds * (2.223 - (4.45 * area(nds)))
+            if (isTRUE(n > 6) == TRUE && isTRUE(sqrt(((max(nds[, 
+                1]) - min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 
+                2])))/nrow(nds)) < (1/2.8)) == TRUE) {
+                nds <- nds * (2.223 - (4.45 * sqrt(((max(nds[, 
+                  1]) - min(nds[, 1])) * (max(nds[, 2]) - min(nds[, 
+                  2])))/nrow(nds))))
             } else {
-                nds <- nds * (1 - area(nds))
+                nds <- nds * (1 - sqrt(((max(nds[, 1]) - min(nds[, 
+                  1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)))
             }
-            are <- 50L + (1/area(nds))
+            are <- 50L + (1/sqrt(((max(nds[, 1]) - min(nds[, 
+                1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)))
             ifelse(isTRUE(max(cex) < 2) == TRUE, NA, fds <- fds + 
                 (mean(cex) * 3))
         }, bip = {
             act <- nrm(rng(nn))
             evt <- nrm(rng(mm))
-            Act <- base::cbind(rep(0, nrow(net)), act)
-            Evt <- base::cbind(rep(1, ncol(net)), evt)
-            nds <- base::rbind(Act, Evt)
+            Act <- cbind(rep(0, nrow(net)), act)
+            Evt <- cbind(rep(1, ncol(net)), evt)
+            nds <- rbind(Act, Evt)
+            nds[which(is.nan(nds))] <- 0.5
             nds[, 2] <- nds[, 2] * cos(pi) - nds[, 1] * sin(pi)
             rownames(nds) <- lbs
             if (missing(rot) == FALSE) {
@@ -430,11 +441,11 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             act1 <- nrm(rng(ceiling(nn/2)))
             act2 <- nrm(rng(floor(nn/2)))
             evt <- nrm(rng(mm))
-            Act1 <- base::cbind(rep(0, ceiling(nrow(net)/2)), 
-                act1)
-            Act2 <- base::cbind(rep(2, floor(nrow(net)/2)), act2)
-            Evt <- base::cbind(rep(1, ncol(net)), evt)
-            nds <- base::rbind(Act1, Act2, Evt)
+            Act1 <- cbind(rep(0, ceiling(nrow(net)/2)), act1)
+            Act2 <- cbind(rep(2, floor(nrow(net)/2)), act2)
+            Evt <- cbind(rep(1, ncol(net)), evt)
+            nds <- rbind(Act1, Act2, Evt)
+            nds[which(is.nan(nds))] <- 0.5
             nds[, 2] <- nds[, 2] * cos(pi) - nds[, 1] * sin(pi)
             rownames(nds) <- lbs
             if (missing(rot) == FALSE) {
@@ -458,13 +469,13 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             are <- 30L + (lwd * 10L)
         }, bip3e = {
             act <- nrm(rng(nn))
-            Act <- base::cbind(rep(1, nrow(net)), act)
+            Act <- cbind(rep(1, nrow(net)), act)
             evt1 <- nrm(rng(ceiling(mm/2)))
             evt2 <- nrm(rng(floor(mm/2)))
-            Evt1 <- base::cbind(rep(0, ceiling(ncol(net)/2)), 
-                evt1)
-            Evt2 <- base::cbind(rep(2, floor(ncol(net)/2)), evt2)
-            nds <- base::rbind(Act, Evt1, Evt2)
+            Evt1 <- cbind(rep(0, ceiling(ncol(net)/2)), evt1)
+            Evt2 <- cbind(rep(2, floor(ncol(net)/2)), evt2)
+            nds <- rbind(Act, Evt1, Evt2)
+            nds[which(is.nan(nds))] <- 0.5
             nds[, 2] <- nds[, 2] * cos(pi) - nds[, 1] * sin(pi)
             rownames(nds) <- lbs
             if (missing(rot) == FALSE) {
@@ -492,16 +503,14 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             act2 <- nrm(rng(floor(nn/2)))
             evt1 <- nrm(rng(ceiling(mm/2)) - 1L)
             evt2 <- nrm(rng(floor(mm/2)))
-            Act2 <- base::cbind((act2 * qd) + ((0.05/qd)), rep(0, 
-                floor(nn/2)))
-            Evt2 <- base::cbind((evt2 * qd) + (0.95 - qd), rep(1, 
-                floor(mm/2)))
-            Act1 <- base::cbind(rep(0, ceiling(nn/2)), (act1 * 
-                0.85) + 0.075)
-            Evt1 <- base::cbind(rep(1, ceiling(mm/2)), (evt1 * 
-                0.85) + 0.075)
-            nds <- as.data.frame(base::rbind(Act1, Act2, Evt1, 
-                Evt2))
+            Act2 <- cbind((act2 * qd) + ((0.05/qd)), rep(0, floor(nn/2)))
+            Evt2 <- cbind((evt2 * qd) + (0.95 - qd), rep(1, floor(mm/2)))
+            Act1 <- cbind(rep(0, ceiling(nn/2)), (act1 * 0.85) + 
+                0.075)
+            Evt1 <- cbind(rep(1, ceiling(mm/2)), (evt1 * 0.85) + 
+                0.075)
+            nds <- as.data.frame(rbind(Act1, Act2, Evt1, Evt2))
+            nds[which(is.na(nds))] <- 0.5
             nds[, 2] <- nds[, 2] * cos(pi) - nds[, 1] * sin(pi)
             if (missing(rot) == FALSE) {
                 nds <- as.data.frame(xyrt(nds, as.numeric(rot)))
@@ -521,7 +530,8 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             } else {
                 fds <- 120L
             }
-            are <- 40L + (1/area(nds))
+            are <- 40L + (1/sqrt(((max(nds[, 1]) - min(nds[, 
+                1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)))
         }, rand = {
             ifelse(isTRUE(flgcx == TRUE) == TRUE, fds <- 100L + 
                 (m * 2L), fds <- 100L + (n * 2L))
@@ -533,17 +543,24 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
             nds <- data.frame(X = round(stats::runif(n) * 1L, 
                 5), Y = round(stats::runif(n) * 1L, 5))
             if (isTRUE(n == 3) == TRUE) {
-                if (isTRUE(area(nds) < 1/6) == TRUE) {
+                if (isTRUE(sqrt(((max(nds[, 1]) - min(nds[, 1])) * 
+                  (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)) < 
+                  1/6) == TRUE) {
                   nds <- nds * (n)
-                } else if (isTRUE(area(nds) < 1/5) == TRUE) {
+                } else if (isTRUE(sqrt(((max(nds[, 1]) - min(nds[, 
+                  1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)) < 
+                  1/5) == TRUE) {
                   nds <- nds * (2)
-                } else if (isTRUE(area(nds) < 1/4) == TRUE) {
+                } else if (isTRUE(sqrt(((max(nds[, 1]) - min(nds[, 
+                  1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)) < 
+                  1/4) == TRUE) {
                   nds <- nds * (1.5)
                 } else {
                   NA
                 }
             }
-            are <- 50L + (1/area(nds))
+            are <- 50L + (1/sqrt(((max(nds[, 1]) - min(nds[, 
+                1])) * (max(nds[, 2]) - min(nds[, 2])))/nrow(nds)))
             ifelse(isTRUE(max(cex) < 2) == TRUE, NA, fds <- fds + 
                 (mean(cex) * 3))
             if (missing(rot) == FALSE) {
@@ -616,8 +633,8 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
     else {
         NA
     }
-    if (match.arg(layout) == "stress" | match.arg(layout) == 
-        "rand" | match.arg(layout) == "circ") {
+    if (match.arg(layout) == "force" | match.arg(layout) == "rand" | 
+        match.arg(layout) == "circ") {
         xlim <- c(min(nds[, 1]) - (max(cex)/100L) - (0), max(nds[, 
             1]) + (max(cex)/100L) + (0))
         ylim <- c(min(nds[, 2]) - (max(cex)/100L), max(nds[, 
@@ -834,17 +851,16 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
                   50, NA)
                 if ((isTRUE(is.na(dim(bmnet)[3]) == TRUE | dim(bmnet)[3] == 
                   1) == TRUE)) {
-                  mbnd(pars, rr, bds[[k]], vlt, cx, lwd, vecol, 
-                    directed, asp, bwd, alfa, are, fds, flgcx, 
-                    m)
+                  mbnd(pares = pars, r = rr, b = bds[[k]], vlt, 
+                    cx, lwd, ecol = vecol, directed, asp, bwd, 
+                    alfa, fds, flgcx)
                 }
                 else {
-                  ifelse(isTRUE(length(lty) == 1L) == TRUE, mbnd(pars, 
-                    rr, bds[[k]], vlt1, cx, lwd, vecol[vltc], 
-                    directed, asp, bwd, alfa, are, fds, flgcx, 
-                    m), mbnd(pars, rr, bds[[k]], vlt, cx, lwd, 
-                    vecol[vltc], directed, asp, bwd, alfa, are, 
-                    fds, flgcx, m))
+                  ifelse(isTRUE(length(lty) == 1L) == TRUE, mbnd(pares = pars, 
+                    r = rr, b = bds[[k]], vlt1, cx, lwd, ecol = vecol[vltc], 
+                    directed, asp, bwd, alfa, fds, flgcx), mbnd(pares = pars, 
+                    r = rr, b = bds[[k]], vlt, cx, lwd, ecol = vecol[vltc], 
+                    directed, asp, bwd, alfa, fds, flgcx))
                 }
             }
             else {
@@ -1020,5 +1036,6 @@ function (net, layout = c("bip", "bip3", "bip3e", "bip4", "stress",
     }
     graphics::par(mar = opm)
     graphics::par(bg = obg)
-x <- NULL; rm(x)
+    x <- NULL
+    rm(x)
 }
