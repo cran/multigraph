@@ -1,6 +1,6 @@
-0a21611a80790c8a48ef194e99d9766b *DESCRIPTION
+67722fe5f3cf30e2e9aa3b5ab11ae9eb *DESCRIPTION
 bee09ddd19570102881158300f6176e2 *NAMESPACE
-c893892be321c777445a43588bc17428 *R/bmgraph.R
+a05c690211bf29252327556d41feb9cf *R/bmgraph.R
 29915bdad459f29659b1642b94c4c4a6 *R/ccbnd.R
 bd6c71e59c6f17a3f31bd390880ab22b *R/ccgraph.R
 ada01d25bf5f4118f7fb03be4eb39cf7 *R/conc.R
@@ -24,7 +24,7 @@ bfd89b367e651d9224a7a65b2f40257c *R/xyrtb.R
 0e446d2e0952b4cf362170617aebae2d *man/hc.Rd
 705fd1814c00c2cf3a4facd8a3dde86d *man/lz.Rd
 df9e8f9bf09cf387032f2a39b3c70646 *man/mbnd.Rd
-f59204b26b3d5ce0fa92e452964b4591 *man/multigraph-package.Rd
+be3f04d115c26de71b4f0fbafa43931f *man/multigraph-package.Rd
 35fa025ef0e7df2df784633950b5ba47 *man/multigraph.Rd
 7e4a67c9806ada69be53417c3f9f5465 *man/nrm.Rd
 e488360d1f02f316a2bdfd98a64a6406 *man/popl.Rd

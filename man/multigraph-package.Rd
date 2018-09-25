@@ -12,9 +12,9 @@ Functions to create and manipulate multigraphs, bipartite graphs, and weighted m
 \tabular{ll}{
 Package: \tab multigraph \cr
 Type: \tab Package \cr
-Version: \tab 0.90 (devel) \cr
+Version: \tab 0.91 (devel) \cr
 Depends: \tab multiplex (>= 2.9) \cr
-Date: \tab 22 September 2018 \cr
+Date: \tab 25 September 2018 \cr
 License: \tab GPL-3 \cr
 }
 This package contains functions to create, plot and manipulate multigraphs, signed and weighted multigraphs, bipartite graphs, and Cayley graphs with multiple edges. 
