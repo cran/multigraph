@@ -21,7 +21,7 @@ frcd(net, seed = seed, maxiter, drp, scl, mov, ...)
         (optional) the maximum number of iterations 
 }
   \item{drp}{
-	(optional) for \code{weighted} networks, drop values less than specified
+	(optional) for \code{valued} networks, drop values less than specified
 }
   \item{\dots}{
 	Additional argument items 
