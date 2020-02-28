@@ -29,7 +29,7 @@ an algebraic structure, typically a \code{"Semigroup"} object class
 	(optional) the maximum number of iterations in layout algorithms. Ignored except for \code{force}, \code{stress} and \code{rand}
 }
   \item{alpha}{
-	vector (vertex, edge, \code{bg}) with the alpha color transparecy
+	vector (vertex, edge, \code{bg}) with the alpha color transparency
 }
   \item{scope}{
    (optional) the scope of the graph (see details)
@@ -38,7 +38,7 @@ an algebraic structure, typically a \code{"Semigroup"} object class
 	(optional, logical, and experimental) plot graph loops?
 }
   \item{collRecip}{
-	(optional and logical) whether or not collapse reciprocated edges in the unidrected graph
+	(optional and logical) whether or not collapse reciprocated edges in the undirected graph
 }
   \item{undRecip}{
 	(optional and logical) whether or not plot reciprocated edges as undirected
@@ -62,7 +62,7 @@ an algebraic structure, typically a \code{"Semigroup"} object class
 	(optional) the size of the vertices
 }
   \item{lwd}{
-	(optional) the width of the edges. Ignored if \code{weighted} is set to \code{TRUE}
+	(optional) the width of the edges. Ignored if \code{valued} is set to \code{TRUE}
 }
   \item{pch}{
 	(optional) the symbol representing the vertices
@@ -71,7 +71,7 @@ an algebraic structure, typically a \code{"Semigroup"} object class
 	(optional) the shape of the edges
 }
   \item{bwd}{
-	(optional) the width of the bundle edges. Ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size). For \code{weighted} a value greater than one is possible
+	(optional) the width of the bundle edges. Ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size). For \code{valued} a value greater than one is possible
 }
   \item{bwd2}{
 	(optional) the width of the bundle loop edges. 
@@ -165,7 +165,8 @@ an algebraic structure, typically a \code{"Semigroup"} object class
 }
 }
 \details{
-The Cayley colour graph is a graphical representation of the relationships among relations in the relational structure of a given multiplex network. Both nodes and directed edges represent string relations and each shape (and color) corresponds to a specific generator relation of the semigroup structure.
+The Cayley colour graph is a graphical representation of the relationships among relations in the relational structure of a given multiplex network. 
+Both nodes and directed edges represent string relations, and each shape (and color) corresponds to a specific generator relation of the semigroup structure.
 
 }
 \value{

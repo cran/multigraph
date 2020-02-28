@@ -1,6 +1,5 @@
 \name{bmgraph}
 \alias{bmgraph}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Bipartite multigraph
 }
@@ -15,7 +14,6 @@ A function to create and manipulate bipartite multigraphs
           maxiter = 100, bwd, clu, pch, rot, mirrorX, mirrorY, mirrorV, mirrorH, hds, 
           vedist, jitter, sort, add, adc, perm, ffamily, fstyle, fsize, fcol, vclu, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{net}{
 	data frame or array representing the two-mode network (see \emph{details})
@@ -50,7 +48,7 @@ A function to create and manipulate bipartite multigraphs
 	(optional) data frame with the coordinates of the vertices. If coordinates are given then the \code{layout} option is ignored
 }
   \item{alpha}{
-	vector (vertex, edge, \code{bg}) with the alpha color transparecy
+	vector (vertex, edge, \code{bg}) with the alpha color transparency
 }
   \item{showLbs}{
 	(optional and logical) whether or not show the vertex labels when dimnames available
@@ -77,13 +75,13 @@ A function to create and manipulate bipartite multigraphs
 	(optional) the margins of the plot
 }
   \item{directed}{
-	(optional and logical) whether or not the graph is directed or unidrected
+	(optional and logical) whether or not the graph is directed or undirected
 }
   \item{valued}{
 	(optional and logical) whether or not the graph is valued or with dichotomous data
 }
   \item{collRecip}{
-	(optional and logical) whether or not collapse reciprocated edges in the unidrected graph
+	(optional and logical) whether or not collapse reciprocated edges in the undirected graph
 }
   \item{cex}{
 	(optional) the size of the vertices
@@ -184,10 +182,11 @@ A function to create and manipulate bipartite multigraphs
 }
 }
 \details{
-Bipartite graphs are visualization devices for two-mode networks. Although this type of data would typically record as a data frame, it is possible to use even three dimensional arrays where each level corresponds to a particular type of tie, and thus the bipartite graphs in this case will be depicted with parallel edges. Besides, it is possible to obtain a graph of the bipartite network using the binomial approach to two-mode data, and plot it with a forced directed algorithm.
+Bipartite graphs are visualization devices for two-mode networks. Although this type of data would typically record as a data frame, it is possible to use even three-dimensional arrays where each level corresponds to a particular type of tie. Thus the bipartite graphs, in this case, will be depicted with parallel edges. 
+Besides, it is possible to obtain a figure of the bipartite network using the binomial approach to two-mode data and plot it with a force-directed algorithm. 
 }
 \value{
-A plot of the two-mode network as bipartite graph or multigraph with a projection
+A plot of the two-mode network as a bipartite graph or multigraph with a projection
 }
 %\references{
 %% ~put references to the literature/web site here ~
