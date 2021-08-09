@@ -62,7 +62,7 @@ arr <- round( replace( array(runif(18), c(3,3,2)), array(runif(18),
 ## Coordinates for the stress majorization layout with random start
 coord <- stsm(arr, seed = NULL)
 
-## Plot multigraph with costumized coordenates
+## Plot multigraph with customized coordenates
 multigraph(arr, coord = coord)
 
 }

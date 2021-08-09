@@ -71,7 +71,7 @@ arr <- round( replace( array(runif(18), c(3,3,2)), array(runif(18),
 ## Coordinates for the concentric layout with two radii
 coord <- conc(arr, nr = 2)
 
-## Plot multigraph with costumized coordenates
+## Plot multigraph with customized coordenates
 multigraph(arr, coord = coord)
 
 }

@@ -42,7 +42,7 @@ multigraph(net, layout = c("circ", "force", "stress", "conc", "rand"), scope,
 	(logical) whether or not the graph is directed or undirected
 }
   \item{loops}{
-	(optional, logical) plot graph loops?
+	(optional, logical) plot loops in the graph?
 }
   \item{signed}{
 	(optional and logical) whether or not the graph is a signed structure
@@ -132,7 +132,7 @@ multigraph(net, layout = c("circ", "force", "stress", "conc", "rand"), scope,
 	(optional and experimental) the width of the bundle loop edges. 
 }
   \item{pos}{
-	(optional) the position of the vertices' labels (\code{0} means ``in the middle of the vertex'')
+	(optional) the position of the vertices' labels (\code{0} means ``at the middle of the vertex'')
 }
   \item{bg}{
 	(optional) the background color of the plot
@@ -221,12 +221,13 @@ Multigraphs are graphs having parallel edges depicting different types of relati
 
 Since this function can handle a large number of arguments, these can be stored as a list object that is passed through the \code{scope} option. In this case a vector made of lists and scalars or combinations of these is accepted.
 
-The bundle width specified by \code{bwd} (and \code{bwd2} for loops) ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size). For the \code{valued} option, numbers higher than one are possible.
+The bundle width specified by \code{bwd} (and \code{bwd2} for loops) ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size). For the \code{valued} option, numbers higher than one are possible. 
+Use \code{vedist} to adjust vertex--edge distance for large and dense networks.
 
 In some cases, such as when working with dynamic networks, it is needed to specify the ordering of the ``levels'' of the clustering information given in \code{clu}, and this is done in argument \code{lclu}. 
 }
 \value{
-A plot of the network as a multigraph or a valued multigraph.
+A plot of the network as a multigraph that is valued or signed.
 }
 %\references{
 %% ~put references to the literature/web site here ~
@@ -235,7 +236,7 @@ A plot of the network as a multigraph or a valued multigraph.
 Antonio Rivero Ostoic
 }
 %\note{
-%%  ~~further notes~~
+%
 %}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -260,7 +261,7 @@ multigraph(arr, valued = TRUE)
 ## As signed graph
 multigraph(arr, signed = TRUE)
 
-## With loops and a costumized vertex size
+## With loops and a customized vertex size
 multigraph(arr, cex = 3, loops = TRUE)
 
 }

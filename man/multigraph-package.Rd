@@ -12,9 +12,9 @@ Functions to create and manipulate multigraphs, bipartite graphs, and valued mul
 \tabular{ll}{
 Package: \tab multigraph \cr
 Type: \tab Package \cr
-Version: \tab 0.93 (devel) \cr
+Version: \tab 0.95 (devel) \cr
 Depends: \tab \CRANpkg{multiplex} (>= 2.9) \cr
-Date: \tab 28 February 2020 \cr
+Date: \tab 9 August 2021 \cr
 License: \tab GPL-3 \cr
 }
 This package contains functions to plot diverse types of graphs representing complex network structures. 
@@ -30,6 +30,8 @@ J. Antonio Rivero Ostoic
 Maintainer: Antonio Rivero Ostoic <multiplex@post.com>
 }
 \references{
+Ostoic, J.A.R. \emph{Algebraic Analysis of Social Networks: Models, Methods and Applications Using R}, Wiley, 2021
+
 Ostoic, J.A.R. `Algebraic Analysis of Multiple Social Networks with \code{multiplex}.' \emph{Journal of Statistical Software}, 91(11), 1-41. <doi:10.18637/jss.v092.i11>
 }
 
