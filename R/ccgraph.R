@@ -4,13 +4,20 @@ function (x, main = NULL, seed = 0, maxiter = 100, alpha = c(1,
     conc, coord, clu, cex, lwd, pch, lty, bwd, bwd2, att, bg, 
     mar, pos, asp, ecol, vcol, vcol0, lbs, col, lbat, swp, swp2, 
     scl, mirrorX, mirrorY, mirrorD, mirrorL, mirrorV, mirrorH, 
-    rot, hds, vedist, ffamily, fstyle, fsize, fcol, ...) 
+    rot, hds, vedist, ffamily, fstyle, fsize, fcol, nr, ...) 
 {
     pclu <- NULL
     if (isTRUE("Semigroup" %in% attr(x, "class")) == TRUE) {
         ifelse(is.null(x$ord) == FALSE, n <- x$ord, n <- dim(x$S)[1])
-        ifelse(isTRUE(x$st == dimnames(x$S)[[1]]) == TRUE, Lbs <- x$st, 
-            Lbs <- dimnames(x$S)[[1]])
+        if (all(x$st %in% dimnames(x$S)[[1]]) == TRUE) {
+            Lbs <- x$st
+        }
+        else {
+            if (isTRUE(unique(unlist(x$S)) %in% dimnames(x$S)[[1]]) == 
+                FALSE) 
+                warning("Semigroup labels do not match table elements.")
+            Lbs <- dimnames(x$S)[[1]]
+        }
         if (any(is.na(x$gens)) == TRUE || is.null(x$gens) == 
             TRUE) {
             warning("Generators are not provided, and first element of 'x' is taken.")
@@ -249,7 +256,12 @@ function (x, main = NULL, seed = 0, maxiter = 100, alpha = c(1,
     ifelse(isTRUE(length(scl) == 1) == TRUE, scl <- rep(scl, 
         2), scl <- scl[1:2])
     ifelse(missing(vedist) == TRUE, vedist <- 0, NA)
-    ifelse(isTRUE(vedist > 1L) == TRUE, vedist <- 1L, NA)
+    if (isTRUE(vedist > 10L) == TRUE) {
+        vedist <- 10L
+    }
+    else if (isTRUE(vedist < (-10L)) == TRUE) {
+        vedist <- -10L
+    }
     if (missing(lbs) == TRUE) {
         ifelse(is.null(dimnames(net)[[1]]) == TRUE, lbs <- as.character(seq_len(dim(net)[1])), 
             lbs <- dimnames(net)[[1]])
@@ -509,7 +521,7 @@ function (x, main = NULL, seed = 0, maxiter = 100, alpha = c(1,
         flgcrd <- FALSE
         ifelse(isTRUE(conc == TRUE) == FALSE, crd <- frcd(netd, 
             seed = seed, maxiter = maxiter), crd <- conc(netd, 
-            ...))
+            nr, ...))
     }
     if (missing(rot) == FALSE) {
         crd[, 1:2] <- xyrt(crd[, 1:2], as.numeric(rot))
@@ -786,12 +798,9 @@ function (x, main = NULL, seed = 0, maxiter = 100, alpha = c(1,
         NA
     }
     if (isTRUE(loops == TRUE) == TRUE) {
-        if (isTRUE(swp == TRUE) == TRUE) {
-            bdlp <- bd$loop[rev(seq_len(length(bd$loop)))]
-        }
-        else {
-            bdlp <- bd$loop
-        }
+        ifelse(isTRUE(swp == TRUE) == TRUE && isTRUE(z == 2L) == 
+            TRUE, Lt <- rev(Lt), NA)
+        bdlp <- bd$loop
         ndss <- nds
         ndss[, 1] <- ndss[, 1] * scl[1]
         ndss[, 2] <- ndss[, 2] * scl[2]
@@ -833,7 +842,7 @@ function (x, main = NULL, seed = 0, maxiter = 100, alpha = c(1,
                 else {
                   ifelse(missing(bwd2) == TRUE, dz <- (rng(z) + 
                     abs(min(rng(z))))/(10L), dz <- (bwd2) * (rng(z) + 
-                    abs(min(rng(z))))/(1L))
+                    abs(min(rng(z))))/(4))
                 }
             }
             ifelse(isTRUE(cx > 3L) == TRUE, fcex <- 3L, fcex <- floor(cx))
