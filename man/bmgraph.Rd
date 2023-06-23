@@ -42,10 +42,10 @@ A function to create and manipulate bipartite multigraphs
        \code{circ2} two semi-circles  
 }
   \item{scope}{
-   (optional) scope of the graph (see details)
+   (optional) scope of the graph (see \emph{details})
 }
   \item{coord}{
-	(optional) data frame with the coordinates of the vertices. If coordinates are given then the \code{layout} option is ignored
+	(optional) data frame with the coordinates of the vertices; if coordinates are given then the \code{layout} option is ignored
 }
   \item{alpha}{
 	vector (vertex, edge, \code{bg}) with the alpha color transparency
@@ -90,7 +90,7 @@ A function to create and manipulate bipartite multigraphs
 	(optional) position of the vertices' labels (\code{0} means ``at the center of the vertex'')
 }
   \item{lwd}{
-	(optional) width of the edges. Ignored if \code{valued} is set to \code{TRUE}
+	(optional) width of the edges; ignored if \code{valued} is set to \code{TRUE}
 }
   \item{lty}{
 	(optional) shape of the edges
@@ -117,7 +117,8 @@ A function to create and manipulate bipartite multigraphs
 	(optional) maximum number of iterations in layout algorithms. Ignored except for \code{force}, \code{stress} and \code{rand}
 }
   \item{bwd}{
-	(optional) width of the bundle edges. Ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size). For \code{valued} a value greater than one is possible
+	(optional) width of the bundle edges: ranges from \code{0} (edges collapsed) to the default \code{1} (depending on the vertices' size), and 
+	for \code{valued} a value greater than one is possible
 }
   \item{clu}{
 	(optional) clustering of the vertices (see \emph{details})
@@ -129,10 +130,10 @@ A function to create and manipulate bipartite multigraphs
 	(optional) clockwise rotation of the graph in degrees 
 }
   \item{mirrorX}{
-	(optional) mirror of the X axis
+	(optional) mirror of the \eqn{X} axis
 }
   \item{mirrorY}{
-	(optional) mirror of the Y axis
+	(optional) mirror of the \eqn{Y} axis
 }
   \item{mirrorV}{
 	\emph{same as \code{mirrorX}}
@@ -174,8 +175,7 @@ A function to create and manipulate bipartite multigraphs
 	(optional) font color
 }
   \item{vclu}{
-	(optional) a list of vectors the clustering information in both the domain and the codomain
-%%     ~~Describe \code{vclu} here~~ \code{cluc} was 
+	(optional) clustering information in both the domain and the codomain in a list of vectors with integers or \code{NULL} (see \emph{details}) 
 }
   \item{\dots}{
 	Additional argument items (see e.g. \code{\link[graphics:par]{par}})
@@ -184,6 +184,10 @@ A function to create and manipulate bipartite multigraphs
 \details{
 Bipartite graphs are visualization devices for two-mode networks. Although this type of data would typically record as a data frame, it is possible to use even three-dimensional arrays where each level corresponds to a particular type of tie. Thus the bipartite graphs, in this case, will be depicted with parallel edges. 
 Besides, it is possible to obtain a figure of the bipartite network using the binomial approach to two-mode data and plot it with a force-directed algorithm. 
+
+Since bipartite graphs have two domains of vertices, the clustering information in \code{vclu}, for the colors of vertices for example, 
+is in a list with two vectors; one vector for each domain. 
+It is possible to class all members of the domain or co-domain into a single class by setting the vector to \code{NULL}.
 }
 \value{
 A plot of the two-mode network as a bipartite graph or multigraph with a projection
@@ -204,17 +208,17 @@ Antonio Rivero Ostoic
 \code{\link{multigraph}}, \code{\link{frcd}}, \code{\link{stsm}}, \code{\link{conc}}
 }
 \examples{
-## Create the data: two binary relations among three elements
+## two binary relations among three elements
 arr <- round( replace( array(runif(18), c(3,3,2)), array(runif(18),
        c(3,3,2))>.5, 3 ) )
 
-## Plot this network as Bipartite graph
+## network as bipartite graph
 bmgraph(arr)
 
-## Now with a Force Directed algorithm
+## with a force directed algorithm
 bmgraph(arr, layout = "force")
 
-## And with a Correspondence Analysis method
+## with a Correspondence Analysis method
 bmgraph(arr, layout = "CA", asp = NA)
 
 }
